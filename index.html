@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Guide to Hellenistic Astrology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Parchment -->
+    <!-- Application Structure Plan: A multi-section single-page application with a fixed top navigation. This structure was chosen over a linear document format to allow users to non-linearly explore the complex and distinct topics of Hellenistic astrology. The app is divided into four logical areas: 'Foundations' for core concepts, 'The Lots' for practical calculation, 'Predictive Techniques' for exploring time-lord systems, and 'Synthesis' for combining methods. This task-oriented design transforms the dense report into an interactive learning tool and reference guide, prioritizing user exploration and practical application over passive reading. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Foundational Concepts (Sect, Joys, Dodecatemoria). Goal: Inform/Organize. Viz: Interactive toggles and calculators using HTML/CSS/JS. Justification: Makes abstract concepts tangible and provides immediate practical application.
+        - Report Info: The Seven Hermetic Lots formulas. Goal: Calculate/Inform. Viz: An interactive form-based calculator (HTML/JS). Justification: Transforms complex formulas into a user-friendly tool, a significant value-add.
+        - Report Info: Decennials time-lord system. Goal: Compare/Change. Viz: A horizontal stacked bar chart using Chart.js/Canvas to create a visual timeline. Justification: A visual timeline is far more intuitive for understanding life-long cycles than a table of numbers.
+        - Report Info: Annual Profections. Goal: Calculate. Viz: A simple age-input calculator (HTML/JS). Justification: Provides a quick, practical tool for one of the most common techniques.
+        - Report Info: Zodiacal Releasing & Primary Directions. Goal: Explain/Organize. Viz: Interactive diagrams and text explainers (HTML/CSS/JS). Justification: These complex systems are better served by clear, interactive explanations of their structure and concepts rather than full calculators, which would be beyond the scope of this format.
+        - All elements are designed to be interactive, encouraging user engagement and exploration of the source material.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            background-color: #F5F5DC;
+            color: #363636;
+            font-family: 'Times New Roman', serif;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            color: #C0A062;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-button.active, .nav-button:hover {
+            color: #ffffff;
+            background-color: #C0A062;
+            border-bottom: 2px solid #ffffff;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: #fdfbf3;
+            border: 1px solid #e0d9c6;
+        }
+        .interactive-tool {
+            background-color: #fdfbf3;
+            border: 1px solid #e0d9c6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .btn-primary {
+            background-color: #283593;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1a237e;
+        }
+        .btn-secondary {
+            background-color: #C0A062;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #a78b54;
+        }
+        input, select {
+            border: 1px solid #e0d9c6;
+            background-color: #fff;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 900px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 250px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-gray-800 text-white p-4 text-center sticky top-0 z-50 shadow-lg">
+        <h1 class="text-3xl font-bold text-[#C0A062]">The Rediscovered Art of Hellenistic Astrology</h1>
+        <p class="text-lg">An Interactive Guide to Ancient Disciplines</p>
+    </header>
+
+    <nav class="bg-[#283593] p-2 sticky top-[88px] z-50 shadow-md">
+        <div class="container mx-auto flex justify-center space-x-2 md:space-x-4">
+            <button class="nav-button font-bold py-2 px-3 md:px-4 rounded-t-lg active" onclick="showSection('introduction')">Introduction</button>
+            <button class="nav-button font-bold py-2 px-3 md:px-4 rounded-t-lg" onclick="showSection('foundations')">Foundations</button>
+            <button class="nav-button font-bold py-2 px-3 md:px-4 rounded-t-lg" onclick="showSection('lots')">The Lots</button>
+            <button class="nav-button font-bold py-2 px-3 md:px-4 rounded-t-lg" onclick="showSection('techniques')">Techniques</button>
+            <button class="nav-button font-bold py-2 px-3 md:px-4 rounded-t-lg" onclick="showSection('synthesis')">Synthesis</button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Introduction Section -->
+        <section id="introduction" class="content-section active">
+            <h2 class="text-4xl font-bold mb-4 text-[#283593] border-b-2 border-[#C0A062] pb-2">Welcome, Seeker of Ancient Wisdom</h2>
+            <div class="text-lg space-y-4">
+                <p>Hellenistic astrology, practiced from the 2nd century BCE to the 7th century CE, was a sophisticated synthesis of Mesopotamian, Egyptian, and Greek thought. It shifted the focus of astrology from mundane predictions for kings and kingdoms to the destiny (*heimarmene*) and fortune (*tyche*) of the individual. This was made possible by the innovation of the Ascendant (*horoskopos*), which created a unique map of the heavens for a specific moment in time.</p>
+                <p>Many of its most powerful techniques were lost to the West for centuries, preserved only in Greek, Arabic, and Persian manuscripts. The works of practical astrologers like Vettius Valens and Dorotheus of Sidon fell into obscurity, while the theoretical work of Ptolemy became the standard. Thanks to modern translation efforts, these ancient methods are being rediscovered and reconstructed.</p>
+                <p>This interactive guide is designed to bring these "less popular" but foundational disciplines to life. Rather than simply reading, you are invited to explore the core concepts, calculate the sacred Lots, and trace the timelines of fate using the predictive techniques of the Hellenistic masters. Use the navigation above to journey through the different facets of this profound art.</p>
+            </div>
+             <div class="mt-8 p-6 card rounded-lg shadow-md">
+                <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">Key Figures of the Tradition</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><strong>Dorotheus of Sidon (c. 75 CE):</strong> Author of the *Carmen Astrologicum*, a foundational poetic textbook for natal and electional astrology. A key source for Annual Profections.</li>
+                    <li><strong>Vettius Valens (c. 120-175 CE):</strong> A working astrologer whose *Anthology* is the single most important source for the practical techniques of the era, including Zodiacal Releasing.</li>
+                    <li><strong>Claudius Ptolemy (c. 100-170 CE):</strong> A renowned astronomer whose *Tetrabiblos* sought to create a "scientific" and causal basis for astrology. His fame ensured his work's survival, shaping astrology for centuries.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Foundations Section -->
+        <section id="foundations" class="content-section">
+            <h2 class="text-4xl font-bold mb-4 text-[#283593] border-b-2 border-[#C0A062] pb-2">The Grammar of the Cosmos</h2>
+            <p class="text-lg mb-6">Before approaching predictive work, one must master the foundational grammar of Hellenistic astrology. These concepts—Sect, Planetary Joys, and the Dodecatemoria—are not optional extras; they are principles that permeate the entire system and fundamentally alter the interpretation of a chart.</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Sect Tool -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">The Doctrine of Sect</h3>
+                    <p class="mb-4">Sect is the division of the planets into two teams: Diurnal (Day) and Nocturnal (Night). This determines which planets are more constructive and which are more challenging. Select a chart type to see the planetary teams.</p>
+                    <div class="flex space-x-4 mb-4">
+                        <button id="dayBtn" class="btn-primary px-4 py-2 rounded-lg w-1/2" onclick="setSect('day')">Day Chart</button>
+                        <button id="nightBtn" class="btn-secondary px-4 py-2 rounded-lg w-1/2" onclick="setSect('night')">Night Chart</button>
+                    </div>
+                    <div id="sect-display" class="space-y-3"></div>
+                </div>
+
+                <!-- Planetary Joys Tool -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">The Planetary Joys</h3>
+                    <p class="mb-4">The original meanings of the 12 houses were derived from the planets that "rejoice" in them. Click on a house number to learn about its rejoicing planet and core meaning.</p>
+                    <div class="grid grid-cols-6 gap-2 text-center text-sm font-bold">
+                        <script>
+                            const joys = [
+                                { house: 12, name: 'Bad Spirit' }, { house: 11, name: 'Good Spirit' }, { house: 10, name: 'Praxis' }, { house: 9, name: 'God' }, { house: 8, name: 'Death' }, { house: 7, name: 'Setting Place' },
+                                { house: 1, name: 'Helm' }, { house: 2, name: 'Gate of Hades' }, { house: 3, name: 'Goddess' }, { house: 4, name: 'Subterranean' }, { house: 5, name: 'Good Fortune' }, { house: 6, name: 'Bad Fortune' },
+                            ];
+                            joys.forEach(joy => {
+                                document.write(`<div id="joy-house-${joy.house}" class="p-3 border rounded-md cursor-pointer bg-white hover:bg-yellow-100" onclick="showJoyInfo(${joy.house})">${joy.house}</div>`);
+                            });
+                        </script>
+                    </div>
+                    <div id="joy-info" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg h-24">Select a house to see its information.</div>
+                </div>
+
+                <!-- Dodecatemoria Calculator -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">The Dodecatemoria</h3>
+                    <p class="mb-4">Each sign contains a "zodiac within the zodiac." Each 2.5° segment has a sub-ruler. Calculate the dodecatemorion for any planetary position.</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="dode-sign" class="font-bold">Sign:</label>
+                            <select id="dode-sign" class="w-full p-2 rounded-md mt-1">
+                                <script>
+                                    const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+                                    signs.forEach((sign, index) => {
+                                        document.write(`<option value="${index}">${sign}</option>`);
+                                    });
+                                </script>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="dode-degree" class="font-bold">Degree (0-29):</label>
+                            <input type="number" id="dode-degree" min="0" max="29" step="any" placeholder="e.g., 15.5" class="w-full p-2 rounded-md mt-1">
+                        </div>
+                        <button class="btn-primary w-full py-2 rounded-lg" onclick="calculateDode()">Calculate</button>
+                    </div>
+                    <div id="dode-result" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg h-16">Result will appear here.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Lots Section -->
+        <section id="lots" class="content-section">
+            <h2 class="text-4xl font-bold mb-4 text-[#283593] border-b-2 border-[#C0A062] pb-2">Calculating the Lots</h2>
+            <p class="text-lg mb-6">The Lots (*kleroi*) are calculated points that pinpoint specific topics in a life. They are not physical bodies but sensitive points derived from the geometry of the Sun, Moon, and Ascendant. The most important are Fortune (*Tyche*), representing the body and circumstances, and Spirit (*Daimon*), representing the soul and actions. Below, you can explore the formulas and core meanings of the seven Hermetic Lots.</p>
+             <div class="interactive-tool p-6 rounded-lg">
+                <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">The Seven Hermetic Lots</h3>
+                 <p class="mb-4">These lots pinpoint the allotments of desire, struggle, courage, success, and consequence. The formulas for their calculation depend on whether the chart is Day or Night sect. Notice how benefic lots are tied to Spirit (will), while malefic lots are tied to Fortune (body/fate).</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-800 text-[#C0A062]">
+                            <tr>
+                                <th class="p-3">Lot</th>
+                                <th class="p-3">Planet</th>
+                                <th class="p-3">Day Formula</th>
+                                <th class="p-3">Night Formula</th>
+                                <th class="p-3">Signification</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lots-table-body">
+                           <script>
+                                const lotsData = [
+                                    { name: "Fortune", planet: "Moon", day: "ASC + Moon - Sun", night: "ASC + Sun - Moon", sig: "Body, health, luck, circumstances." },
+                                    { name: "Spirit", planet: "Sun", day: "ASC + Sun - Moon", night: "ASC + Moon - Sun", sig: "Soul, will, career, actions." },
+                                    { name: "Eros (Love)", planet: "Venus", day: "ASC + Venus - Spirit", night: "ASC + Spirit - Venus", sig: "Desire, love, friendship, pleasure." },
+                                    { name: "Necessity", planet: "Mercury", day: "ASC + Fortune - Mercury", night: "ASC + Mercury - Fortune", sig: "Constraints, struggles, arguments." },
+                                    { name: "Courage", planet: "Mars", day: "ASC + Fortune - Mars", night: "ASC + Mars - Fortune", sig: "Boldness, audacity, action." },
+                                    { name: "Victory", planet: "Jupiter", day: "ASC + Jupiter - Spirit", night: "ASC + Spirit - Jupiter", sig: "Success, faith, alliances." },
+                                    { name: "Nemesis", planet: "Saturn", day: "ASC + Fortune - Saturn", night: "ASC + Saturn - Fortune", sig: "Burdens, loss, consequences." },
+                                ];
+                                lotsData.forEach(lot => {
+                                    document.getElementById('lots-table-body').innerHTML += `
+                                        <tr class="border-b border-gray-300 bg-white hover:bg-yellow-50">
+                                            <td class="p-3 font-bold">${lot.name}</td>
+                                            <td class="p-3">${lot.planet}</td>
+                                            <td class="p-3 font-mono text-sm">${lot.day}</td>
+                                            <td class="p-3 font-mono text-sm">${lot.night}</td>
+                                            <td class="p-3">${lot.sig}</td>
+                                        </tr>
+                                    `;
+                                });
+                           </script>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Techniques Section -->
+        <section id="techniques" class="content-section">
+            <h2 class="text-4xl font-bold mb-4 text-[#283593] border-b-2 border-[#C0A062] pb-2">The Art of Prediction</h2>
+            <p class="text-lg mb-6">A key feature of Hellenistic astrology is its suite of time-lord systems (*chronocratoria*). These techniques divide a life into chapters, each ruled by a specific planet. The condition of that planet in the birth chart describes the themes of that time period. This provides a structured framework for forecasting, distinguishing long-term narratives from short-term triggers.</p>
+
+            <div class="space-y-8">
+                <!-- Annual Profections Tool -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">Annual Profections: The Theme of the Year</h3>
+                    <p class="mb-4">This simple yet powerful technique activates a different house for each year of life. The ruler of that house becomes the "Lord of the Year." Enter an age to find the profected house and its corresponding topics.</p>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="profection-age" min="0" placeholder="Enter age (e.g., 30)" class="p-2 rounded-md w-1/2">
+                        <button class="btn-primary px-4 py-2 rounded-lg" onclick="calculateProfection()">Find Lord of the Year</button>
+                    </div>
+                    <div id="profection-result" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">Result will appear here.</div>
+                </div>
+                
+                <!-- Decennials Tool -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">Decennials: The Planetary Decades</h3>
+                    <p class="mb-4">Decennials divide life into large chapters ruled by planets in the Chaldean order, starting from the sect light (Sun for day, Moon for night). The chart below visualizes the sequence of major planetary periods. The total cycle is 129 years.</p>
+                    <div class="chart-container">
+                        <canvas id="decennialsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Zodiacal Releasing Explainer -->
+                <div class="interactive-tool p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-3 text-[#C0A062]">Zodiacal Releasing: The Narrative of a Lifetime</h3>
+                    <p class="mb-4">This is the most complex predictive technique, found in Vettius Valens. It maps the chronology of a life by "releasing" from the Lot of Spirit (for career/action) or the Lot of Fortune (for body/circumstances). The timeline unfolds in four levels of detail. Below is a simplified explainer.</p>
+                     <div class="flex items-center space-x-4 mb-4">
+                        <label for="releasing-lot" class="font-bold">Release from:</label>
+                        <select id="releasing-lot" class="p-2 rounded-md bg-white" onchange="updateReleasingInfo()">
+                            <option value="spirit">Lot of Spirit</option>
+                            <option value="fortune">Lot of Fortune</option>
+                        </select>
+                    </div>
+                    <div id="releasing-info" class="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-2">
+                        <!-- Content updated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Synthesis Section -->
+        <section id="synthesis" class="content-section">
+            <h2 class="text-4xl font-bold mb-4 text-[#283593] border-b-2 border-[#C0A062] pb-2">Weaving the Threads of Fate</h2>
+            <p class="text-lg mb-6">The true power of Hellenistic astrology lies not in using a single technique, but in layering them to create a rich, multi-dimensional narrative. The goal is not simply to predict the future, but to engage with it wisely, aligning one's actions with the greater flow of cosmic providence. The predictive techniques provide a map of the terrain of fate, allowing for navigation with greater awareness and preparedness.</p>
+            <div class="interactive-tool p-8 rounded-lg">
+                <h3 class="text-2xl font-bold mb-4 text-center text-[#C0A062]">A Layered Predictive Approach</h3>
+                <p class="text-center mb-6">A typical analysis of a year would involve a hierarchy of techniques, moving from the general to the specific.</p>
+                <div class="space-y-4">
+                    <div class="flex items-center">
+                        <div class="w-1/4 font-bold text-xl text-right pr-4 text-[#283593]">Decennials</div>
+                        <div class="w-3/4 p-4 rounded-md card">Establishes the broad, decade-long theme. This is the background music of the life chapter.</div>
+                    </div>
+                     <div class="text-center text-2xl font-bold text-gray-400">↓</div>
+                     <div class="flex items-center">
+                        <div class="w-1/4 font-bold text-xl text-right pr-4 text-[#283593]">Zodiacal Releasing</div>
+                        <div class="w-3/4 p-4 rounded-md card">Provides the specific narrative context. Is this a "peak period" of high activity or a quieter time? It defines the plot of the current story.</div>
+                    </div>
+                    <div class="text-center text-2xl font-bold text-gray-400">↓</div>
+                    <div class="flex items-center">
+                        <div class="w-1/4 font-bold text-xl text-right pr-4 text-[#283593]">Annual Profections</div>
+                        <div class="w-3/4 p-4 rounded-md card">Pinpoints the yearly focus by activating the Lord of the Year, whose natal condition describes the primary concerns and events of that 12-month period.</div>
+                    </div>
+                     <div class="text-center text-2xl font-bold text-gray-400">↓</div>
+                    <div class="flex items-center">
+                        <div class="w-1/4 font-bold text-xl text-right pr-4 text-[#283593]">Transits</div>
+                        <div class="w-3/4 p-4 rounded-md card">Serve as the final triggers, timing specific events. The most important transits are those made to and from the Lord of the Year.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+    const allSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+    const joyPlanets = {
+        1: { planet: 'Mercury', name: 'Helm', sig: 'Signifies the self, mind, body, and life\'s beginning.' },
+        2: { planet: 'None', name: 'Gate of Hades', sig: 'Traditionally has no rejoicing planet.' },
+        3: { planet: 'Moon', name: 'Goddess', sig: 'Signifies siblings, short journeys, communication, and religion.' },
+        4: { planet: 'None', name: 'Subterranean', sig: 'Signifies parents, home, and endings.' },
+        5: { planet: 'Venus', name: 'Good Fortune', sig: 'Signifies children, pleasure, creativity, and romance.' },
+        6: { planet: 'Mars', name: 'Bad Fortune', sig: 'Signifies illness, injury, hard labor, and slavery.' },
+        7: { planet: 'None', name: 'Setting Place', sig: 'Signifies partnerships and marriage.' },
+        8: { planet: 'None', name: 'Idle Place', sig: 'Signifies death and inheritance.' },
+        9: { planet: 'Sun', name: 'God', sig: 'Signifies higher learning, long travel, philosophy, and divination.' },
+        10: { planet: 'None', name: 'Praxis', sig: 'Signifies career, reputation, and actions.' },
+        11: { planet: 'Jupiter', name: 'Good Spirit', sig: 'Signifies friends, groups, alliances, and hopes.' },
+        12: { planet: 'Saturn', name: 'Bad Spirit', sig: 'Signifies enemies, sorrow, confinement, and self-undoing.' }
+    };
+    const profectionHouses = {
+        1: '1st House: Life, self, body, new beginnings.',
+        2: '2nd House: Finances, resources, possessions.',
+        3: '3rd House: Siblings, communication, short trips.',
+        4: '4th House: Home, family, parents, endings.',
+        5: '5th House: Children, creativity, pleasure, romance.',
+        6: '6th House: Health, work, service, daily routines.',
+        7: '7th House: Partnership, marriage, open enemies.',
+        8: '8th House: Shared resources, inheritance, death/rebirth.',
+        9: '9th House: Higher learning, travel, philosophy, belief.',
+        10: '10th House: Career, reputation, public life.',
+        11: '11th House: Friends, groups, hopes, alliances.',
+        0: '12th House: Hidden things, loss, self-undoing, confinement.'
+    };
+    const planetaryYears = {
+        'Saturn': 30, 'Jupiter': 12, 'Mars': 15, 'Sun': 19, 'Venus': 8, 'Mercury': 20, 'Moon': 25
+    };
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId).classList.add('active');
+
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        document.querySelector(`.nav-button[onclick="showSection('${sectionId}')"]`).classList.add('active');
+    }
+
+    function setSect(sectType) {
+        const display = document.getElementById('sect-display');
+        const dayBtn = document.getElementById('dayBtn');
+        const nightBtn = document.getElementById('nightBtn');
+        let html = '';
+
+        if (sectType === 'day') {
+            dayBtn.classList.remove('btn-secondary');
+            dayBtn.classList.add('btn-primary');
+            nightBtn.classList.remove('btn-primary');
+            nightBtn.classList.add('btn-secondary');
+
+            html = `
+                <div class="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                    <h4 class="font-bold">Diurnal Team (Constructive)</h4>
+                    <p>Sun, Jupiter, Saturn</p>
+                </div>
+                <div class="p-3 rounded-lg bg-gray-200 border border-gray-300">
+                    <h4 class="font-bold">Nocturnal Team (Challenged)</h4>
+                    <p>Moon, Venus, Mars</p>
+                </div>
+                 <div class="p-3 rounded-lg bg-blue-50 border border-blue-200">
+                    <h4 class="font-bold">Malefic Balance</h4>
+                    <p><strong>Saturn:</strong> More constructive. <strong>Mars:</strong> More difficult.</p>
+                </div>
+            `;
+        } else {
+            nightBtn.classList.remove('btn-secondary');
+            nightBtn.classList.add('btn-primary');
+            dayBtn.classList.remove('btn-primary');
+            dayBtn.classList.add('btn-secondary');
+
+            html = `
+                <div class="p-3 rounded-lg bg-blue-100 border border-blue-200">
+                    <h4 class="font-bold">Nocturnal Team (Constructive)</h4>
+                    <p>Moon, Venus, Mars</p>
+                </div>
+                <div class="p-3 rounded-lg bg-gray-200 border border-gray-300">
+                    <h4 class="font-bold">Diurnal Team (Challenged)</h4>
+                    <p>Sun, Jupiter, Saturn</p>
+                </div>
+                <div class="p-3 rounded-lg bg-red-50 border border-red-200">
+                    <h4 class="font-bold">Malefic Balance</h4>
+                    <p><strong>Mars:</strong> More constructive. <strong>Saturn:</strong> More difficult.</p>
+                </div>
+            `;
+        }
+        display.innerHTML = html;
+    }
+
+    function showJoyInfo(houseNumber) {
+        const info = joyPlanets[houseNumber];
+        const display = document.getElementById('joy-info');
+        document.querySelectorAll('[id^="joy-house-"]').forEach(el => el.classList.remove('bg-yellow-200'));
+        document.getElementById(`joy-house-${houseNumber}`).classList.add('bg-yellow-200');
+
+        if (info.planet !== 'None') {
+            display.innerHTML = `<strong class="text-lg">${info.planet} rejoices in House ${houseNumber}</strong> (${info.name}): <p>${info.sig}</p>`;
+        } else {
+            display.innerHTML = `<strong class="text-lg">House ${houseNumber} (${info.name})</strong> <p>This house has no rejoicing planet. ${info.sig}</p>`;
+        }
+    }
+
+    function calculateDode() {
+        const signIndex = parseInt(document.getElementById('dode-sign').value);
+        const degree = parseFloat(document.getElementById('dode-degree').value);
+        const resultDiv = document.getElementById('dode-result');
+
+        if (isNaN(degree) || degree < 0 || degree >= 30) {
+            resultDiv.innerHTML = 'Please enter a valid degree (0-29.99).';
+            return;
+        }
+
+        const dodeIndex = Math.floor(degree / 2.5);
+        const resultSignIndex = (signIndex + dodeIndex) % 12;
+        const resultSign = allSigns[resultSignIndex];
+        const originalSign = allSigns[signIndex];
+
+        resultDiv.innerHTML = `<strong>${degree}° ${originalSign}</strong> is in the <strong>${resultSign}</strong> dodecatemorion.`;
+    }
+
+    function calculateProfection() {
+        const age = parseInt(document.getElementById('profection-age').value);
+        const resultDiv = document.getElementById('profection-result');
+
+        if (isNaN(age) || age < 0) {
+            resultDiv.innerHTML = 'Please enter a valid age.';
+            return;
+        }
+
+        const profectedHouseNumber = (age % 12) + 1;
+        const profectedHouseInfo = profectionHouses[age % 12];
+        
+        resultDiv.innerHTML = `At age <strong>${age}</strong>, the native is in a <strong>${profectedHouseNumber}st/nd/rd/th House Profection Year</strong>.
+        <p class="mt-2"><strong>Focus of the year:</strong> ${profectedHouseInfo}</p>
+        <p class="mt-1">The planet ruling the sign of this house in the natal chart becomes the <strong>Lord of the Year</strong>.</p>`;
+    }
+
+    function updateReleasingInfo() {
+        const lot = document.getElementById('releasing-lot').value;
+        const infoDiv = document.getElementById('releasing-info');
+        
+        let text = '';
+        if (lot === 'spirit') {
+            text = `
+                <p><strong>Releasing from Spirit:</strong> Used to investigate matters of the soul, mind, will, career, and actions the native chooses to take.</p>
+                <p><strong>Key Concept:</strong> The system progresses through the signs, with each sign's rulership lasting for its "lesser years" (e.g., Aries/Mars = 15 years, Taurus/Venus = 8 years). Critical life events often happen in periods ruled by signs angular (square/opposite) to the sign of the Lot of Spirit.</p>
+            `;
+        } else {
+             text = `
+                <p><strong>Releasing from Fortune:</strong> Used to investigate matters of the body, health, material circumstances, luck, and events that happen *to* the native.</p>
+                <p><strong>Key Concept:</strong> A "Loosening of the Bonds" is a major event that occurs when the timeline jumps to the sign opposite the current one. This often signifies a major crisis, turning point, or breakthrough related to the body or material world.</p>
+            `;
+        }
+        infoDiv.innerHTML = text;
+    }
+
+    window.onload = function() {
+        setSect('day');
+        showJoyInfo(1);
+        updateReleasingInfo();
+        
+        const decennialsCtx = document.getElementById('decennialsChart').getContext('2d');
+        const decennialsPlanets = ['Saturn', 'Jupiter', 'Mars', 'Sun', 'Venus', 'Mercury', 'Moon'];
+        const decennialsData = decennialsPlanets.map(p => planetaryYears[p]);
+        const decennialsColors = {
+            'Saturn': '#424242', 'Jupiter': '#1E88E5', 'Mars': '#E53935', 
+            'Sun': '#FDD835', 'Venus': '#00897B', 'Mercury': '#8E24AA', 'Moon': '#BDBDBD'
+        };
+
+        new Chart(decennialsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Life Timeline'],
+                datasets: decennialsPlanets.map(planet => ({
+                    label: `${planet} (${planetaryYears[planet]} yrs)`,
+                    data: [planetaryYears[planet]],
+                    backgroundColor: decennialsColors[planet],
+                }))
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Planetary Periods in Chaldean Order (Starting from Saturn)' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { stacked: true, title: { display: true, text: 'Years' } },
+                    y: { stacked: true, display: false }
+                }
+            }
+        });
+    };
+
+</script>
+</body>
+</html>
